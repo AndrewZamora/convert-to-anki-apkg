@@ -10,6 +10,7 @@
   "dependencies": {
     "anki-apkg-export": "^4.0.3",
     "core-js": "^3.6.5",
+    "marked": "^2.0.3",
     "vue": "^2.6.11"
   },
   "devDependencies": {
