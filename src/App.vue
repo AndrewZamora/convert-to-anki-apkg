@@ -1,12 +1,14 @@
 <template>
   <div id="app">
     <input type="file" @change="handleFile" accept=".md" />
+    <button v-if="html" @click="convert">Convert</button>
     <div v-if="markdown" v-html="html"></div>
   </div>
 </template>
 
 <script>
 import marked from "marked";
+import { sanitize } from 'dompurify';
 
 export default {
   name: "App",
@@ -22,12 +24,12 @@ export default {
       const file  = event.target.files[0];
       const reader = new FileReader();
       reader.addEventListener("load", (e) => {
-        this.markdown = e.target.result;
+        this.markdown = sanitize(e.target.result);
       });
       reader.addEventListener("loadend", ()=> {
         this.html = this.convertToHTML(this.markdown);
       });
-      reader.readAsBinaryString(file);
+      reader.readAsText(file);
     },
     convertToHTML(md) {
       marked.setOptions({
@@ -37,6 +39,14 @@ export default {
       });
       return marked(md);
     },
+    convert(){
+      const div = document.createElement("div");
+      div.innerHTML = this.html;
+      const allH2 = div.querySelectorAll("h2");
+      [...allH2].forEach(tag => {
+        console.log(tag.nextElementSibling)
+      })
+    }
   },
 };
 </script>
