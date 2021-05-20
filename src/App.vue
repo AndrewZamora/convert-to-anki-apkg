@@ -1,14 +1,16 @@
 <template>
   <div id="app">
     <input type="file" @change="handleFile" accept=".md" />
-    <button v-if="html" @click="convert">Convert</button>
+    <button v-if="html" @click="exportAnkiDeck">Export</button>
     <div v-if="markdown" v-html="html"></div>
   </div>
 </template>
 
 <script>
 import marked from "marked";
-import { sanitize } from 'dompurify';
+import { sanitize } from "dompurify";
+import AnkiExport from "anki-apkg-export";
+import { saveAs } from "file-saver";
 
 export default {
   name: "App",
@@ -16,17 +18,17 @@ export default {
   data() {
     return {
       markdown: "",
-      html:""
+      html: "",
     };
   },
   methods: {
     handleFile(event) {
-      const file  = event.target.files[0];
+      const file = event.target.files[0];
       const reader = new FileReader();
       reader.addEventListener("load", (e) => {
         this.markdown = sanitize(e.target.result);
       });
-      reader.addEventListener("loadend", ()=> {
+      reader.addEventListener("loadend", () => {
         this.html = this.convertToHTML(this.markdown);
       });
       reader.readAsText(file);
@@ -39,16 +41,23 @@ export default {
       });
       return marked(md);
     },
-    convert(){
+    async exportAnkiDeck() {
+      const apkg = new AnkiExport("testDeck");
       const div = document.createElement("div");
       div.innerHTML = this.html;
       const allH2 = div.querySelectorAll("h2");
-      [...allH2].forEach(tag => {
-        console.log(tag.textContent,tag.nextElementSibling.textContent)
-        // tag.textContent
-        // tag.nextElementSibling.textContent
-      })
-    }
+      [...allH2].forEach((tag) => {
+        const {
+          textContent: front,
+          nextElementSibling: { textContent: back },
+        } = tag;
+        apkg.addCard(front, back);
+      });
+      const zip = await apkg
+        .save()
+        .catch((err) => console.log(err.stack || err));
+      saveAs(zip, "testdeck.apkg");
+    },
   },
 };
 </script>
