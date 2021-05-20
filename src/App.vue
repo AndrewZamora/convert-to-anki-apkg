@@ -44,7 +44,9 @@ export default {
       div.innerHTML = this.html;
       const allH2 = div.querySelectorAll("h2");
       [...allH2].forEach(tag => {
-        console.log(tag.nextElementSibling)
+        console.log(tag.textContent,tag.nextElementSibling.textContent)
+        // tag.textContent
+        // tag.nextElementSibling.textContent
       })
     }
   },
