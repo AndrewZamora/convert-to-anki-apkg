@@ -2,7 +2,7 @@
   <div id="app">
     <input type="file" @change="handleFile" accept=".md" />
     <button v-if="html" @click="exportAnkiDeck">Export</button>
-    <div v-if="markdown" v-html="html"></div>
+    <!-- <div v-if="markdown" v-html="html"></div> -->
   </div>
 </template>
 
@@ -42,10 +42,12 @@ export default {
       return marked(md);
     },
     async exportAnkiDeck() {
-      const apkg = new AnkiExport("testDeck");
       const div = document.createElement("div");
       div.innerHTML = this.html;
       const allH2 = div.querySelectorAll("h2");
+      const h1 = div.querySelector("h1");
+      const deckName = h1.textContent;
+      const apkg = new AnkiExport(deckName);
       [...allH2].forEach((tag) => {
         const {
           textContent: front,
@@ -56,7 +58,7 @@ export default {
       const zip = await apkg
         .save()
         .catch((err) => console.log(err.stack || err));
-      saveAs(zip, "testdeck.apkg");
+      saveAs(zip, `${deckName}.apkg`);
     },
   },
 };
