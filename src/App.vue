@@ -2,7 +2,12 @@
   <div id="app">
     <input type="file" @change="handleFile" accept=".md" />
     <button v-if="html" @click="exportAnkiDeck">Export</button>
-    <!-- <div v-if="markdown" v-html="html"></div> -->
+    <div class="textarea">
+      <div class="editor">
+        <tiptap v-model="textarea" />
+      </div>
+      <div class="preview" v-if="preview" v-html="preview"></div>
+    </div>
   </div>
 </template>
 
@@ -11,14 +16,16 @@ import marked from "marked";
 import { sanitize } from "dompurify";
 import AnkiExport from "anki-apkg-export";
 import { saveAs } from "file-saver";
+import Tiptap from "./components/tiptap.vue";
 
 export default {
   name: "App",
-  components: {},
+  components: { Tiptap },
   data() {
     return {
       markdown: "",
       html: "",
+      textarea: "",
     };
   },
   methods: {
@@ -61,16 +68,34 @@ export default {
       saveAs(zip, `${deckName}.apkg`);
     },
   },
+  computed: {
+    preview() {
+      if (this.textarea) {
+        return sanitize(this.textarea);
+      }
+      return "";
+    },
+  },
 };
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+}
+.textarea {
+  display: flex;
+}
+
+.editor {
+  flex: 1;
+  margin-right: 2em;
+}
+
+.preview {
+  flex: 1;
+}
+
+.preview h2 {
+  border-bottom: black 2px solid;
 }
 </style>
