@@ -5,6 +5,7 @@
     <div class="textarea">
       <div class="editor">
         <tiptap v-model="textarea" />
+        <button @click="submit">Submit</button>
       </div>
       <div class="preview" v-if="preview" v-html="preview"></div>
     </div>
@@ -29,6 +30,10 @@ export default {
     };
   },
   methods: {
+    submit() {
+      this.html = this.textarea;
+      this.exportAnkiDeck();
+    },
     handleFile(event) {
       const file = event.target.files[0];
       const reader = new FileReader();
