@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <h1>Markdown to Anki Deck</h1>
     <input type="file" @change="handleFile" accept=".md" />
     <button v-if="html" @click="exportAnkiDeck">Export</button>
     <div class="textarea">
@@ -31,8 +32,7 @@ export default {
   },
   methods: {
     submit() {
-      this.html = this.textarea;
-      this.exportAnkiDeck();
+      this.exportAnkiDeck(this.textarea);
     },
     handleFile(event) {
       const file = event.target.files[0];
@@ -53,9 +53,9 @@ export default {
       });
       return marked(md);
     },
-    async exportAnkiDeck() {
+    async exportAnkiDeck(html) {
       const div = document.createElement("div");
-      div.innerHTML = this.html;
+      div.innerHTML = html;
       const allH2 = div.querySelectorAll("h2");
       const h1 = div.querySelector("h1");
       const deckName = h1.textContent;
@@ -75,8 +75,9 @@ export default {
   },
   computed: {
     preview() {
-      if (this.textarea) {
-        return sanitize(this.textarea);
+      const somethingToPreview = this.html ? this.html : this.textarea;
+      if (somethingToPreview) {
+        return sanitize(somethingToPreview);
       }
       return "";
     },
@@ -102,5 +103,6 @@ export default {
 
 .preview h2 {
   border-bottom: black 2px solid;
+  text-align: center;
 }
 </style>
