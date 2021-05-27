@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <router-view></router-view>
     <h1>Markdown to Anki Deck</h1>
     <input type="file" @change="handleFile" accept=".md" />
     <button v-if="html" @click="exportAnkiDeck">Export</button>
