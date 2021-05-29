@@ -7,10 +7,10 @@
     <div class="textarea">
       <div class="editor">
         <tiptap v-model="textarea" />
-        <button @click="submit">Submit</button>
       </div>
-      <div class="preview" v-if="preview" v-html="preview"></div>
+      <div class="preview" v-html="preview"></div>
     </div>
+    <button @click="submit">Submit</button>
   </div>
 </template>
 

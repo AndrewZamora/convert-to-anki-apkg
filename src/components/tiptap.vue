@@ -1,6 +1,11 @@
 <template>
   <editor-content :editor="editor" />
 </template>
+<style>
+.ProseMirror {
+  border: black  solid 2px;
+}
+</style>
 
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-2'
