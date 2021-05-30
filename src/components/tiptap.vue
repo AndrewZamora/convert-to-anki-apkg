@@ -4,6 +4,9 @@
 <style>
 .ProseMirror {
   border: black  solid 2px;
+  word-break: break-all;
+  overflow-y: auto;
+  height: 50vh;
 }
 </style>
 

@@ -91,6 +91,8 @@ export default {
 }
 .textarea {
   display: flex;
+  height: 50vh;
+  margin-bottom: 10px;
 }
 
 .editor {
@@ -100,6 +102,8 @@ export default {
 
 .preview {
   flex: 1;
+  word-break: break-all;
+  overflow-y: auto;
 }
 
 .preview h2 {
