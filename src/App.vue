@@ -1,14 +1,17 @@
 <template>
   <div id="app">
     <router-view></router-view>
-    <h1>Markdown to Anki Deck</h1>
     <input type="file" @change="handleFile" accept=".md" />
     <button v-if="html" @click="exportAnkiDeck">Export</button>
     <div class="textarea">
       <div class="editor">
+        <h2>Markdown to Anki Deck</h2>
         <tiptap v-model="textarea" />
       </div>
-      <div class="preview" v-html="preview"></div>
+      <div class="preview-container">
+        <h2>Deck Preview</h2>
+        <div class="preview" v-html="preview"></div>
+      </div>
     </div>
     <button @click="submit">Submit</button>
   </div>
@@ -91,13 +94,16 @@ export default {
 }
 .textarea {
   display: flex;
-  height: 50vh;
   margin-bottom: 10px;
 }
 
 .editor {
   flex: 1;
   margin-right: 2em;
+}
+
+.preview-container {
+  flex: 1;
 }
 
 .preview {
