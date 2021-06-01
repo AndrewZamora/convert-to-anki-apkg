@@ -110,6 +110,9 @@ export default {
   flex: 1;
   word-break: break-all;
   overflow-y: auto;
+  hyphens: auto;
+  word-wrap: break-word;
+  height: 50vh;
 }
 
 .preview h2 {
