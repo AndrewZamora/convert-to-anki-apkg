@@ -10,7 +10,7 @@
       </div>
       <div class="preview-container">
         <h2>Deck Preview</h2>
-        <div class="preview" v-html="preview"></div>
+        <div class="preview" v-html="preview" @scroll="syncScroll($event)"></div>
       </div>
     </div>
     <button @click="submit">Submit</button>
@@ -76,6 +76,9 @@ export default {
         .catch((err) => console.log(err.stack || err));
       saveAs(zip, `${deckName}.apkg`);
     },
+    syncScroll(e){
+      console.log(e.target.scrollTop)
+    }
   },
   computed: {
     preview() {

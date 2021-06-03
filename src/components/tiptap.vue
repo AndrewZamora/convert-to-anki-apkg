@@ -1,5 +1,5 @@
 <template>
-  <editor-content :editor="editor" />
+  <editor-content :editor="editor" @scroll="syncScroll($event)"/>
 </template>
 <style>
 .ProseMirror {
@@ -67,5 +67,10 @@ export default {
   beforeDestroy() {
     this.editor.destroy()
   },
+  methods: {
+    syncScroll(e) {
+      console.log(e)
+    }
+  }
 }
 </script>
