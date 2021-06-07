@@ -3,17 +3,23 @@
     <router-view></router-view>
     <input type="file" @change="handleFile" accept=".md" />
     <button v-if="html" @click="exportAnkiDeck">Export</button>
-    <div class="textarea">
+    <div class="textarea-container">
       <div class="editor">
         <h2>Markdown to Anki Deck</h2>
-        <tiptap v-model="textarea" />
+        <textarea v-model="textareaMd" class="textarea"  @scroll="syncScroll($event)"></textarea>
       </div>
       <div class="preview-container">
         <h2>Deck Preview</h2>
-        <div class="preview" v-html="preview" @scroll="syncScroll($event)"></div>
+        <div
+          class="preview"
+          v-html="preview"
+          @scroll="syncScroll($event)"
+        ></div>
       </div>
     </div>
-    <button @click="submit">Submit</button>
+    <div>
+      <button @click="submit">Submit</button>
+    </div>
   </div>
 </template>
 
@@ -22,16 +28,15 @@ import marked from "marked";
 import { sanitize } from "dompurify";
 import AnkiExport from "anki-apkg-export";
 import { saveAs } from "file-saver";
-import Tiptap from "./components/tiptap.vue";
+// import Tiptap from "./components/tiptap.vue";
 
 export default {
   name: "App",
-  components: { Tiptap },
   data() {
     return {
       markdown: "",
       html: "",
-      textarea: "",
+      textareaMd: "",
     };
   },
   methods: {
@@ -76,13 +81,13 @@ export default {
         .catch((err) => console.log(err.stack || err));
       saveAs(zip, `${deckName}.apkg`);
     },
-    syncScroll(e){
-      console.log(e.target.scrollTop)
-    }
+    syncScroll(e) {
+      console.log(e.target.scrollTop);
+    },
   },
   computed: {
     preview() {
-      const somethingToPreview = this.html ? this.html : this.textarea;
+      const somethingToPreview = this.convertToHTML(this.textareaMd);
       if (somethingToPreview) {
         return sanitize(somethingToPreview);
       }
@@ -96,6 +101,11 @@ export default {
 #app {
 }
 .textarea {
+  height: 50vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+.textarea-container {
   display: flex;
   margin-bottom: 10px;
 }
