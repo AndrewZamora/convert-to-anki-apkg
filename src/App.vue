@@ -6,14 +6,14 @@
     <div class="textarea-container">
       <div class="editor">
         <h2>Markdown to Anki Deck</h2>
-        <textarea v-model="textareaMd" class="textarea"  @scroll="syncScroll($event)"></textarea>
+        <textarea v-model="textareaMd" class="textarea"  @scroll="syncScroll($event)" @input="syncScroll($event)"></textarea>
       </div>
       <div class="preview-container">
         <h2>Deck Preview</h2>
         <div
           class="preview"
           v-html="preview"
-          @scroll="syncScroll($event)"
+          ref="preview"
         ></div>
       </div>
     </div>
@@ -82,8 +82,8 @@ export default {
       saveAs(zip, `${deckName}.apkg`);
     },
     syncScroll(e) {
-      console.log(e.target.scrollTop);
-    },
+      this.$refs.preview.scrollTop = e.target.scrollTop;
+    }
   },
   computed: {
     preview() {
@@ -104,6 +104,8 @@ export default {
   height: 50vh;
   width: 100%;
   box-sizing: border-box;
+  resize: none;
+  font-size: 25px;
 }
 .textarea-container {
   display: flex;
