@@ -128,6 +128,7 @@ export default {
   hyphens: auto;
   word-wrap: break-word;
   height: 50vh;
+  border: solid 1px black;
 }
 
 .preview h2 {
@@ -144,6 +145,9 @@ export default {
   }
   .textarea {
     height: 25vh;
+  }
+  .editor {
+    margin-right: 0;
   }
 }
 </style>
