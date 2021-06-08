@@ -134,4 +134,16 @@ export default {
   border-bottom: black 2px solid;
   text-align: center;
 }
+
+@media screen and (max-width: 500px){
+  .textarea-container {
+    flex-direction: column-reverse;
+  }
+  .preview {
+    height: 25vh;
+  }
+  .textarea {
+    height: 25vh;
+  }
+}
 </style>
