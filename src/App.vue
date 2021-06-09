@@ -5,7 +5,7 @@
     <button v-if="html" @click="exportAnkiDeck">Export</button>
     <div class="textarea-container">
       <div class="editor">
-        <h2>Markdown to Anki Deck</h2>
+        <h2 class="textarea-title">Markdown to Anki Deck</h2>
         <textarea v-model="textareaMd" class="textarea"  @scroll="syncScroll($event)" @input="syncScroll($event)"></textarea>
       </div>
       <div class="preview-container">
@@ -18,7 +18,7 @@
       </div>
     </div>
     <div>
-      <button @click="submit">Submit</button>
+      <button @click="submit">Create Deck</button>
     </div>
   </div>
 </template>
@@ -105,11 +105,18 @@ export default {
   width: 100%;
   box-sizing: border-box;
   resize: none;
-  font-size: 25px;
+  font-size: 20px;
+  border: solid 2px black;
 }
 .textarea-container {
   display: flex;
   margin-bottom: 10px;
+}
+
+.textarea-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .editor {
@@ -127,8 +134,8 @@ export default {
   overflow-y: auto;
   hyphens: auto;
   word-wrap: break-word;
-  height: 50vh;
-  border: solid 1px black;
+  height: 49.5vh;
+  border: solid 2px black;
 }
 
 .preview h2 {
