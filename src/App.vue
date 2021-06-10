@@ -134,7 +134,7 @@ export default {
   overflow-y: auto;
   hyphens: auto;
   word-wrap: break-word;
-  height: 49.5vh;
+  height: 50vh;
   border: solid 2px black;
 }
 
