@@ -1,26 +1,33 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
-    <input type="file" @change="handleFile" accept=".md" />
-    <button v-if="html" @click="exportAnkiDeck">Export</button>
-    <div class="textarea-container">
-      <div class="editor">
-        <h2 class="textarea-title">Markdown to Anki Deck</h2>
-        <textarea v-model="textareaMd" class="textarea"  @scroll="syncScroll($event)" @input="syncScroll($event)"></textarea>
+  <v-app>
+    <div id="app">
+      <router-view></router-view>
+      <!-- <input type="file" @change="handleFile" accept=".md" />
+      <button v-if="html" @click="exportAnkiDeck">Export</button> -->
+      <v-tabs>
+        <v-tab @click="currentTab = 'editor'">Editor</v-tab>
+        <v-tab @click="currentTab = 'upload'">Upload</v-tab>
+      </v-tabs>
+      <div class="textarea-container">
+        <div class="editor" v-if="currentTab === 'editor'">
+          <h2 class="textarea-title">Markdown to Anki Deck</h2>
+          <textarea
+            v-model="textareaMd"
+            class="textarea"
+            @scroll="syncScroll($event)"
+            @input="syncScroll($event)"
+          ></textarea>
+        </div>
+        <div class="preview-container">
+          <h2>Deck Preview</h2>
+          <div class="preview" v-html="preview" ref="preview"></div>
+        </div>
       </div>
-      <div class="preview-container">
-        <h2>Deck Preview</h2>
-        <div
-          class="preview"
-          v-html="preview"
-          ref="preview"
-        ></div>
+      <div>
+        <button @click="submit">Create Deck</button>
       </div>
     </div>
-    <div>
-      <button @click="submit">Create Deck</button>
-    </div>
-  </div>
+  </v-app>
 </template>
 
 <script>
@@ -34,6 +41,7 @@ export default {
   name: "App",
   data() {
     return {
+      currentTab: "editor",
       markdown: "",
       html: "",
       textareaMd: "",
@@ -83,7 +91,7 @@ export default {
     },
     syncScroll(e) {
       this.$refs.preview.scrollTop = e.target.scrollTop;
-    }
+    },
   },
   computed: {
     preview() {
@@ -143,7 +151,7 @@ export default {
   text-align: center;
 }
 
-@media screen and (max-width: 500px){
+@media screen and (max-width: 500px) {
   .textarea-container {
     flex-direction: column-reverse;
   }
