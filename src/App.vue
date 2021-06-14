@@ -2,8 +2,6 @@
   <v-app>
     <div id="app">
       <router-view></router-view>
-      <!-- <input type="file" @change="handleFile" accept=".md" />
-      <button v-if="html" @click="exportAnkiDeck">Export</button> -->
       <v-tabs>
         <v-tab @click="currentTab = 'editor'">Editor</v-tab>
         <v-tab @click="currentTab = 'upload'">Upload</v-tab>
@@ -17,6 +15,12 @@
             @scroll="syncScroll($event)"
             @input="syncScroll($event)"
           ></textarea>
+        </div>
+        <div>
+          <div v-if="currentTab === 'upload'">
+            <input type="file" @change="handleFile" accept=".md" />
+            <button v-if="html" @click="exportAnkiDeck">Export</button>
+          </div>
         </div>
         <div class="preview-container">
           <h2>Deck Preview</h2>
