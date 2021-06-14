@@ -24,7 +24,9 @@
         </div>
       </div>
       <div>
-        <button @click="submit">Create Deck</button>
+        <v-btn color="primary" elevation="2" @click="submit">
+          Create Deck</v-btn
+        >
       </div>
     </div>
   </v-app>
