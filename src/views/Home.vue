@@ -15,8 +15,7 @@
         ></textarea>
       </div>
       <div v-if="currentTab === 'upload'" class="upload">
-        <input type="file" @change="handleFile" accept=".md" />
-        <button v-if="html" @click="exportAnkiDeck">Export</button>
+        <input type="file" @change="handleFile" accept=".md,.csv" />
       </div>
       <div class="preview-container">
         <h2>Deck Preview</h2>
@@ -46,18 +45,29 @@ export default {
   },
   methods: {
     submit() {
-      this.exportAnkiDeck(this.textarea);
+      if (this.currentTab === "editor") {
+        this.exportAnkiDeck(this.textareaMd);
+      }
+      if(this.currentTab === "upload") {
+        this.exportAnkiDeck(this.html);
+      }
     },
     handleFile(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.addEventListener("load", (e) => {
-        this.markdown = sanitize(e.target.result);
-      });
-      reader.addEventListener("loadend", () => {
-        this.html = this.convertToHTML(this.markdown);
-      });
-      reader.readAsText(file);
+      const [file] = event.target.files;
+      const { type, name } = file;
+      if (type === "text/csv") {
+        console.log("csv");
+      }
+      if (name.split(".").pop() === "md") {
+        const reader = new FileReader();
+        reader.addEventListener("load", (e) => {
+          this.markdown = sanitize(e.target.result);
+        });
+        reader.addEventListener("loadend", () => {
+          this.html = this.convertToHTML(this.markdown);
+        });
+        reader.readAsText(file);
+      }
     },
     convertToHTML(md) {
       marked.setOptions({
@@ -93,8 +103,11 @@ export default {
   computed: {
     preview() {
       const somethingToPreview = this.convertToHTML(this.textareaMd);
-      if (somethingToPreview) {
+      if (somethingToPreview && this.currentTab === "editor") {
         return sanitize(somethingToPreview);
+      }
+      if (this.currentTab === "upload") {
+        return this.html;
       }
       return "";
     },
@@ -103,7 +116,6 @@ export default {
 </script>
 
 <style>
-
 .textarea {
   height: 50vh;
   width: 100%;
@@ -164,7 +176,7 @@ export default {
     height: 25vh;
   }
   .upload {
-    flex:none;
+    flex: none;
     height: 25vh;
   }
   .editor {

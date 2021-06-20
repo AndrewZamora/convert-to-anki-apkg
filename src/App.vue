@@ -11,10 +11,7 @@
 </template>
 
 <script>
-// import Tiptap from "./components/tiptap.vue";
 </script>
 
 <style>
-#app {
-}
 </style>
