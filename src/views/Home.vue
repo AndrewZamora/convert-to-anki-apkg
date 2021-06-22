@@ -48,26 +48,28 @@ export default {
       if (this.currentTab === "editor") {
         this.exportAnkiDeck(this.textareaMd);
       }
-      if(this.currentTab === "upload") {
+      if (this.currentTab === "upload") {
         this.exportAnkiDeck(this.html);
       }
     },
-    handleFile(event) {
+    async handleFile(event) {
       const [file] = event.target.files;
       const { type, name } = file;
-      if (type === "text/csv") {
-        console.log("csv");
-      }
-      if (name.split(".").pop() === "md") {
-        const reader = new FileReader();
-        reader.addEventListener("load", (e) => {
+      const isMarkdown = name.split(".").pop() === "md";
+      const isCSV = type === "text/csv";
+      const reader = new FileReader();
+      reader.addEventListener("load", (e) => {
+        if(isMarkdown) {
           this.markdown = sanitize(e.target.result);
-        });
-        reader.addEventListener("loadend", () => {
-          this.html = this.convertToHTML(this.markdown);
-        });
-        reader.readAsText(file);
-      }
+        }
+        if(isCSV) {
+          this.csv = e.target.result;
+        }
+      });
+      reader.addEventListener("loadend", () => {
+        this.html = this.convertToHTML(this.markdown);
+      });
+      reader.readAsText(file);
     },
     convertToHTML(md) {
       marked.setOptions({
