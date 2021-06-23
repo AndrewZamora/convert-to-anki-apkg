@@ -41,6 +41,7 @@ export default {
       markdown: "",
       html: "",
       textareaMd: "",
+      csv: ""
     };
   },
   methods: {
@@ -54,20 +55,23 @@ export default {
     },
     async handleFile(event) {
       const [file] = event.target.files;
-      const { type, name } = file;
-      const isMarkdown = name.split(".").pop() === "md";
-      const isCSV = type === "text/csv";
+      const { name } = file;
+      const fileType = name.split(".").pop();
+      console.log(file)
+      console.log(`${file},${fileType}`);
       const reader = new FileReader();
       reader.addEventListener("load", (e) => {
-        if(isMarkdown) {
+        if (fileType === "md") {
           this.markdown = sanitize(e.target.result);
         }
-        if(isCSV) {
+        if (fileType === "csv") {
           this.csv = e.target.result;
         }
       });
       reader.addEventListener("loadend", () => {
-        this.html = this.convertToHTML(this.markdown);
+        if(fileType === "md"){
+          this.html = this.convertToHTML(this.markdown);
+        }
       });
       reader.readAsText(file);
     },
