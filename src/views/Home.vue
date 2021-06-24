@@ -41,7 +41,7 @@ export default {
       markdown: "",
       html: "",
       textareaMd: "",
-      csv: ""
+      csv: "",
     };
   },
   methods: {
@@ -57,19 +57,20 @@ export default {
       const [file] = event.target.files;
       const { name } = file;
       const fileType = name.split(".").pop();
-      console.log(file)
+      console.log(file);
       console.log(`${file},${fileType}`);
       const reader = new FileReader();
       reader.addEventListener("load", (e) => {
         if (fileType === "md") {
           this.markdown = sanitize(e.target.result);
         }
-        if (fileType === "csv") {
-          this.csv = e.target.result;
-        }
       });
-      reader.addEventListener("loadend", () => {
-        if(fileType === "md"){
+      reader.addEventListener("loadend", (e) => {
+        if (fileType === "csv") {
+          const csv = this.parseCSV(e.target.result);
+          this.html = this.convertToHTML(csv);
+        }
+        if (fileType === "md") {
           this.html = this.convertToHTML(this.markdown);
         }
       });
@@ -101,6 +102,19 @@ export default {
         .save()
         .catch((err) => console.log(err.stack || err));
       saveAs(zip, `${deckName}.apkg`);
+    },
+    parseCSV(csv) {
+      const [, ...data] = csv.split("\n");
+      let markdown = [];
+      data.forEach(row => {
+        if(row.length > 0) {
+          const [front, back] = row.split(',');
+          const newCard = `## ${front}\n${back}\n`;
+          markdown = [...markdown, newCard]
+        }
+      });
+      console.log(markdown.join(""))
+      return markdown.join("");
     },
     syncScroll(e) {
       this.$refs.preview.scrollTop = e.target.scrollTop;
