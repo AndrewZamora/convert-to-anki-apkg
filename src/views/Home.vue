@@ -15,7 +15,10 @@
         ></textarea>
       </div>
       <div v-if="currentTab === 'upload'" class="upload">
-        <input type="file" @change="handleFile" accept=".md,.csv" />
+        <div v-if="csv">
+          {{ parsedCSV }}
+        </div>
+        <input v-else type="file" @change="handleFile" accept=".md,.csv" />
       </div>
       <div class="preview-container">
         <h2>Deck Preview</h2>
@@ -23,7 +26,7 @@
       </div>
     </div>
     <div>
-      <v-btn color="primary" elevation="2" @click="submit"> Create Deck</v-btn>
+      <v-btn color="primary" elevation="2" @click="submit">Create Deck</v-btn>
     </div>
   </v-container>
 </template>
@@ -67,8 +70,9 @@ export default {
       });
       reader.addEventListener("loadend", (e) => {
         if (fileType === "csv") {
-          const csv = this.parseCSV(e.target.result);
-          this.html = this.convertToHTML(csv);
+          const md = this.parseCSVToMarkdown(e.target.result);
+          this.csv = e.target.result;
+          this.html = this.convertToHTML(md);
         }
         if (fileType === "md") {
           this.html = this.convertToHTML(this.markdown);
@@ -103,17 +107,17 @@ export default {
         .catch((err) => console.log(err.stack || err));
       saveAs(zip, `${deckName}.apkg`);
     },
-    parseCSV(csv) {
+    parseCSVToMarkdown(csv) {
       const [, ...data] = csv.split("\n");
       let markdown = [];
-      data.forEach(row => {
-        if(row.length > 0) {
-          const [front, back] = row.split(',');
+      data.forEach((row) => {
+        if (row.length > 0) {
+          const [front, back] = row.split(",");
           const newCard = `## ${front}\n${back}\n`;
-          markdown = [...markdown, newCard]
+          markdown = [...markdown, newCard];
         }
       });
-      console.log(markdown.join(""))
+      console.log(markdown.join(""));
       return markdown.join("");
     },
     syncScroll(e) {
@@ -130,6 +134,20 @@ export default {
         return this.html;
       }
       return "";
+    },
+    parsedCSV() {
+      const rows = this.csv
+        .split("\n")
+        .filter((row) => row != "")
+        .map((row) => row.split(","));
+      const columnNum = rows[0].length;
+      let columns = Array(columnNum).fill([]);
+      rows.forEach((row) => {
+        row.forEach((item, index) => {
+          columns[index] = [...columns[index], item];
+        });
+      });
+      return columns;
     },
   },
 };
