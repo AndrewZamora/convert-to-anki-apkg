@@ -15,9 +15,13 @@
         ></textarea>
       </div>
       <div v-if="currentTab === 'upload'" class="upload">
-        <div v-if="csv">
-          {{ parsedCSV }}
-        </div>
+        <table v-if="csv">
+          <tr v-for="(item, index) in parsedCSV" :key="`parsedCSV${index}`">
+            <template v-for="(row,rowindex) in item" >
+              <td :key="`row${rowindex}`">{{row}}</td>
+            </template>
+          </tr>
+        </table>
         <input v-else type="file" @change="handleFile" accept=".md,.csv" />
       </div>
       <div class="preview-container">
@@ -136,18 +140,7 @@ export default {
       return "";
     },
     parsedCSV() {
-      const rows = this.csv
-        .split("\n")
-        .filter((row) => row != "")
-        .map((row) => row.split(","));
-      const columnNum = rows[0].length;
-      let columns = Array(columnNum).fill([]);
-      rows.forEach((row) => {
-        row.forEach((item, index) => {
-          columns[index] = [...columns[index], item];
-        });
-      });
-      return columns;
+      return this.csv.split("\n").filter((row) => row != "").map(row => row.split(','));
     },
   },
 };
