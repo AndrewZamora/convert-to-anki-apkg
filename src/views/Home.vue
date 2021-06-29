@@ -14,14 +14,27 @@
           @input="syncScroll($event)"
         ></textarea>
       </div>
-      <div v-if="currentTab === 'upload'" class="upload">
-        <table v-if="csv">
-          <tr v-for="(item, index) in parsedCSV" :key="`parsedCSV${index}`">
-            <template v-for="(row,rowindex) in item" >
-              <td :key="`row${rowindex}`">{{row}}</td>
+      <div v-if="currentTab === 'upload'" :class="[csv ? 'uploaded': 'upload']">
+          <v-simple-table v-if="csv">
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">Front</th>
+                  <th class="text-left">Back</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(item, index) in parsedCSV"
+                  :key="`parsedCSV${index}`"
+                >
+                  <template v-for="(row, rowindex) in item">
+                    <td :key="`row${rowindex}`">{{ row }}</td>
+                  </template>
+                </tr>
+              </tbody>
             </template>
-          </tr>
-        </table>
+          </v-simple-table>
         <input v-else type="file" @change="handleFile" accept=".md,.csv" />
       </div>
       <div class="preview-container">
@@ -140,7 +153,10 @@ export default {
       return "";
     },
     parsedCSV() {
-      return this.csv.split("\n").filter((row) => row != "").map(row => row.split(','));
+      return this.csv
+        .split("\n")
+        .filter((row) => row != "")
+        .map((row) => row.split(","));
     },
   },
 };
@@ -165,7 +181,10 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
+.uploaded {
+  display: flex;
+  flex: 1;
+}
 .upload {
   display: flex;
   align-items: center;
