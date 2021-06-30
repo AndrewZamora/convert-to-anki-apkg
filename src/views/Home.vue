@@ -14,27 +14,32 @@
           @input="syncScroll($event)"
         ></textarea>
       </div>
-      <div v-if="currentTab === 'upload'" :class="[csv ? 'uploaded': 'upload']">
-          <v-simple-table v-if="csv">
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th class="text-left">Front</th>
-                  <th class="text-left">Back</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(item, index) in parsedCSV"
-                  :key="`parsedCSV${index}`"
-                >
-                  <template v-for="(row, rowindex) in item">
-                    <td :key="`row${rowindex}`">{{ row }}</td>
-                  </template>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
+      <div
+        v-if="currentTab === 'upload'"
+        :class="[csv ? 'uploaded' : 'upload']"
+      >
+        <v-simple-table v-if="csv">
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-left">Front</th>
+                <th class="text-left">Back</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in parsedCSV" :key="`parsedCSV${index}`">
+                <template v-for="(row, rowindex) in item">
+                  <td :key="`row${rowindex}`">{{ row }}</td>
+                </template>
+                <td>
+                  <v-btn text>
+                    <v-icon dark> mdi-trash-can</v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
         <input v-else type="file" @change="handleFile" accept=".md,.csv" />
       </div>
       <div class="preview-container">
