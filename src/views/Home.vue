@@ -18,28 +18,16 @@
         v-if="currentTab === 'upload'"
         :class="[csv ? 'uploaded' : 'upload']"
       >
-        <v-simple-table v-if="csv">
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th class="text-left">Front</th>
-                <th class="text-left">Back</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in parsedCSV" :key="`parsedCSV${index}`">
-                <template v-for="(row, rowindex) in item">
-                  <td :key="`row${rowindex}`">{{ row }}</td>
-                </template>
-                <td>
-                  <v-btn text>
-                    <v-icon dark> mdi-trash-can</v-icon>
-                  </v-btn>
-                </td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
+        <v-data-table
+        v-if="csv"
+          v-model="selected"
+          :headers="headers"
+          :items="parsedCSV"
+          :single-select="false"
+          item-key="front"
+          show-select
+        >
+        </v-data-table>
         <input v-else type="file" @change="handleFile" accept=".md,.csv" />
       </div>
       <div class="preview-container">
@@ -67,6 +55,15 @@ export default {
       html: "",
       textareaMd: "",
       csv: "",
+      selected: [],
+      headers: [
+        {
+        text: 'Front', value: 'front'
+        },
+        {
+          text: 'Back', value: 'back'
+        }
+      ]
     };
   },
   methods: {
@@ -158,10 +155,14 @@ export default {
       return "";
     },
     parsedCSV() {
-      return this.csv
+      const parsed = this.csv
         .split("\n")
-        .filter((row) => row != "")
-        .map((row) => row.split(","));
+        .filter((row) => row != "").map(row => {
+          const [front, back] = row.split(",");
+          return {front,back}
+        });
+        console.log(parsed)
+      return parsed;
     },
   },
 };
@@ -189,6 +190,7 @@ export default {
 .uploaded {
   display: flex;
   flex: 1;
+  margin-right: 1em;
 }
 .upload {
   display: flex;
