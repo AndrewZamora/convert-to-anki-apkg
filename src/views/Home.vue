@@ -72,6 +72,10 @@ export default {
         this.exportAnkiDeck(this.textareaMd);
       }
       if (this.currentTab === "upload") {
+        if(this.selected.length > 0) {
+          this.exportCSVToAnkiDeck()
+          return;
+        }
         this.exportAnkiDeck(this.html);
       }
     },
@@ -142,6 +146,18 @@ export default {
     syncScroll(e) {
       this.$refs.preview.scrollTop = e.target.scrollTop;
     },
+    async exportCSVToAnkiDeck() {
+      const deckName = "testDeck";
+      const apkg = new AnkiExport(deckName);
+      this.selected.forEach((item) => {
+        const {front, back} = item;
+        apkg.addCard(front, back);
+      });
+      const zip = await apkg
+        .save()
+        .catch((err) => console.log(err.stack || err));
+      saveAs(zip, `${deckName}.apkg`);
+    }
   },
   computed: {
     preview() {
