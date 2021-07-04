@@ -18,8 +18,17 @@
         v-if="currentTab === 'upload'"
         :class="[csv ? 'uploaded' : 'upload']"
       >
+        <div class="deck-name-input">
+          <v-text-field
+            v-if="csv"
+            label="Deck Name"
+            v-model="deckName"
+            :rules="rules"
+            hide-details="auto"
+          ></v-text-field>
+        </div>
         <v-data-table
-        v-if="csv"
+          v-if="csv"
           v-model="selected"
           :headers="headers"
           :items="parsedCSV"
@@ -50,6 +59,11 @@ export default {
   name: "App",
   data() {
     return {
+      deckName: "",
+      rules: [
+        (value) => !!value || "Required.",
+        (value) => (value && value.length >= 3) || "Min 3 characters",
+      ],
       currentTab: "editor",
       markdown: "",
       html: "",
@@ -58,12 +72,14 @@ export default {
       selected: [],
       headers: [
         {
-        text: 'Front', value: 'front'
+          text: "Front",
+          value: "front",
         },
         {
-          text: 'Back', value: 'back'
-        }
-      ]
+          text: "Back",
+          value: "back",
+        },
+      ],
     };
   },
   methods: {
@@ -72,8 +88,8 @@ export default {
         this.exportAnkiDeck(this.textareaMd);
       }
       if (this.currentTab === "upload") {
-        if(this.selected.length > 0) {
-          this.exportCSVToAnkiDeck()
+        if (this.selected.length > 0) {
+          this.exportCSVToAnkiDeck();
           return;
         }
         this.exportAnkiDeck(this.html);
@@ -147,17 +163,19 @@ export default {
       this.$refs.preview.scrollTop = e.target.scrollTop;
     },
     async exportCSVToAnkiDeck() {
-      const deckName = "testDeck";
-      const apkg = new AnkiExport(deckName);
-      this.selected.forEach((item) => {
-        const {front, back} = item;
-        apkg.addCard(front, back);
-      });
-      const zip = await apkg
-        .save()
-        .catch((err) => console.log(err.stack || err));
-      saveAs(zip, `${deckName}.apkg`);
-    }
+      console.log(this.deckName.length, this.deckName)
+      if (this.deckName.length > 3) {
+        const apkg = new AnkiExport(this.deckName);
+        this.selected.forEach((item) => {
+          const { front, back } = item;
+          apkg.addCard(front, back);
+        });
+        const zip = await apkg
+          .save()
+          .catch((err) => console.log(err.stack || err));
+        saveAs(zip, `${this.deckName}.apkg`);
+      }
+    },
   },
   computed: {
     preview() {
@@ -173,11 +191,12 @@ export default {
     parsedCSV() {
       const parsed = this.csv
         .split("\n")
-        .filter((row) => row != "").map(row => {
+        .filter((row) => row != "")
+        .map((row) => {
           const [front, back] = row.split(",");
-          return {front,back}
+          return { front, back };
         });
-        console.log(parsed)
+      console.log(parsed);
       return parsed;
     },
   },
@@ -203,10 +222,16 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.deck-name-input {
+  margin-bottom: 1em;
+}
+
 .uploaded {
   display: flex;
   flex: 1;
   margin-right: 1em;
+  flex-direction: column;
 }
 .upload {
   display: flex;
