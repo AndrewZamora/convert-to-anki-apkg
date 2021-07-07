@@ -18,7 +18,7 @@
         v-if="currentTab === 'upload'"
         :class="[csv ? 'uploaded' : 'upload']"
       >
-        <div class="deck-name-input">
+    <div class="deck-name-input" v-if="selectionFinished">
           <v-text-field
             v-if="csv"
             label="Deck Name"
@@ -27,17 +27,20 @@
             hide-details="auto"
           ></v-text-field>
         </div>
-        <v-data-table
-          v-if="csv"
-          v-model="selected"
-          :headers="headers"
-          :items="parsedCSV"
-          :single-select="false"
-          item-key="front"
-          show-select
-        >
-        </v-data-table>
-        <input v-else type="file" @change="handleFile" accept=".md,.csv" />
+        <div v-if="csv && !selectionFinished">
+          <h2>Select Cards</h2>
+          <v-data-table
+            v-model="selected"
+            :headers="headers"
+            :items="parsedCSV"
+            :single-select="false"
+            item-key="front"
+            show-select
+          >
+          </v-data-table>
+          <v-btn color="primary" elevation="2" @click="selectCards">Submit</v-btn>
+        </div>
+        <input v-if="!csv" type="file" @change="handleFile" accept=".md,.csv" />
       </div>
       <div class="preview-container">
         <h2>Deck Preview</h2>
@@ -45,7 +48,7 @@
       </div>
     </div>
     <div>
-      <v-btn color="primary" elevation="2" @click="submit">Create Deck</v-btn>
+      <v-btn v-if="selectionFinished" color="primary" elevation="2" @click="submit">Create Deck</v-btn>
     </div>
   </v-container>
 </template>
@@ -70,6 +73,7 @@ export default {
       textareaMd: "",
       csv: "",
       selected: [],
+      selectionFinished: false,
       headers: [
         {
           text: "Front",
@@ -163,7 +167,7 @@ export default {
       this.$refs.preview.scrollTop = e.target.scrollTop;
     },
     async exportCSVToAnkiDeck() {
-      console.log(this.deckName.length, this.deckName)
+      console.log(this.deckName.length, this.deckName);
       if (this.deckName.length > 3) {
         const apkg = new AnkiExport(this.deckName);
         this.selected.forEach((item) => {
@@ -176,6 +180,9 @@ export default {
         saveAs(zip, `${this.deckName}.apkg`);
       }
     },
+    selectCards() {
+      this.selectionFinished = true;
+    }
   },
   computed: {
     preview() {
