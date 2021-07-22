@@ -18,7 +18,7 @@
         v-if="currentTab === 'upload'"
         :class="[csv ? 'uploaded' : 'upload']"
       >
-    <div class="deck-name-input" v-if="selectionFinished">
+        <div class="deck-name-input" v-if="selectionFinished">
           <v-text-field
             v-if="csv"
             label="Deck Name"
@@ -38,7 +38,9 @@
             show-select
           >
           </v-data-table>
-          <v-btn color="primary" elevation="2" @click="selectCards">Submit</v-btn>
+          <v-btn color="primary" elevation="2" @click="selectCards"
+            >Submit</v-btn
+          >
         </div>
         <input v-if="!csv" type="file" @change="handleFile" accept=".md,.csv" />
       </div>
@@ -48,7 +50,13 @@
       </div>
     </div>
     <div>
-      <v-btn v-if="selectionFinished" color="primary" elevation="2" @click="submit">Create Deck</v-btn>
+      <v-btn
+        v-if="selectionFinished"
+        color="primary"
+        elevation="2"
+        @click="submit"
+        >Create Deck</v-btn
+      >
     </div>
   </v-container>
 </template>
@@ -180,9 +188,20 @@ export default {
         saveAs(zip, `${this.deckName}.apkg`);
       }
     },
+    async createAnkiDeck(name, cards) {
+      const apkg = new AnkiExport(this.deckName);
+      this.selected.forEach((item) => {
+        const { front, back } = item;
+        apkg.addCard(front, back);
+      });
+      const zip = await apkg
+        .save()
+        .catch((err) => console.log(err.stack || err));
+      saveAs(zip, `${this.deckName}.apkg`);
+    },
     selectCards() {
       this.selectionFinished = true;
-    }
+    },
   },
   computed: {
     preview() {
