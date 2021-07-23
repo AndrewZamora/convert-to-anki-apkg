@@ -214,6 +214,18 @@ export default {
       }
       return "";
     },
+    htmlString() {
+      const htmlString = "";
+      if (this.markdown) {
+        marked.setOptions({
+          // Creates <br> for line carriages (new lines)
+          gfm: true,
+          breaks: true,
+        });
+        htmlString = marked(this.markdown);
+      }
+      return htmlString;
+    },
     parsedCSV() {
       const parsed = this.csv
         .split("\n")
