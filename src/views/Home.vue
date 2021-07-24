@@ -189,8 +189,8 @@ export default {
       }
     },
     async createAnkiDeck(name, cards) {
-      const apkg = new AnkiExport(this.deckName);
-      this.selected.forEach((item) => {
+      const apkg = new AnkiExport(name);
+      cards.forEach((item) => {
         const { front, back } = item;
         apkg.addCard(front, back);
       });
@@ -215,7 +215,7 @@ export default {
       return "";
     },
     htmlString() {
-      const htmlString = "";
+      let htmlString = "";
       if (this.markdown) {
         marked.setOptions({
           // Creates <br> for line carriages (new lines)
