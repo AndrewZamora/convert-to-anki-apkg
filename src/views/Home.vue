@@ -1,23 +1,7 @@
 <template>
   <v-container>
-    <v-tabs>
-      <v-tab @click="currentTab = 'editor'">Editor</v-tab>
-      <v-tab @click="currentTab = 'upload'">Upload</v-tab>
-    </v-tabs>
     <div class="textarea-container">
-      <div class="editor" v-if="currentTab === 'editor'">
-        <h2 class="textarea-title">Markdown to Anki Deck</h2>
-        <textarea
-          v-model="textareaMd"
-          class="textarea"
-          @scroll="syncScroll($event)"
-          @input="syncScroll($event)"
-        ></textarea>
-      </div>
-      <div
-        v-if="currentTab === 'upload'"
-        :class="[csv ? 'uploaded' : 'upload']"
-      >
+      <div :class="[csv ? 'uploaded' : 'upload']">
         <div class="deck-name-input" v-if="selectionFinished">
           <v-text-field
             v-if="csv"
@@ -42,11 +26,15 @@
             >Submit</v-btn
           >
         </div>
-        <input v-if="!csv" type="file" @change="handleFile" accept=".md,.csv" />
+        <input v-if="!csv" type="file" @change="handleFile" accept=".csv" />
       </div>
-      <div class="preview-container">
-        <h2>Deck Preview</h2>
-        <div class="preview" v-html="preview" ref="preview"></div>
+      <div v-if="csv && !selectionFinished" class="preview-container">
+        <dualListSelect
+          :leftLabel="leftLabel"
+          :rightLabel="rightLabel"
+          :options="titles"
+          @updated="handleUpdate"
+        />
       </div>
     </div>
     <div>
@@ -66,46 +54,34 @@ import marked from "marked";
 import { sanitize } from "dompurify";
 import AnkiExport from "anki-apkg-export";
 import { saveAs } from "file-saver";
+import dualListSelect from "../components/dual-list-select";
 export default {
   name: "App",
+  components: {
+    dualListSelect,
+  },
   data() {
     return {
-      deckName: "",
+      deckName: "test",
       rules: [
         (value) => !!value || "Required.",
         (value) => (value && value.length >= 3) || "Min 3 characters",
       ],
-      currentTab: "editor",
       markdown: "",
       html: "",
       textareaMd: "",
       csv: "",
       selected: [],
       selectionFinished: false,
-      headers: [
-        {
-          text: "Front",
-          value: "front",
-        },
-        {
-          text: "Back",
-          value: "back",
-        },
-      ],
+      front: [],
+      back: [],
+      leftLabel: "Front",
+      rightLabel: "Back",
     };
   },
   methods: {
     submit() {
-      if (this.currentTab === "editor") {
-        this.exportAnkiDeck(this.textareaMd);
-      }
-      if (this.currentTab === "upload") {
-        if (this.selected.length > 0) {
-          this.exportCSVToAnkiDeck();
-          return;
-        }
-        this.exportAnkiDeck(this.html);
-      }
+      this.exportCSVToAnkiDeck();
     },
     async handleFile(event) {
       const [file] = event.target.files;
@@ -175,12 +151,20 @@ export default {
       this.$refs.preview.scrollTop = e.target.scrollTop;
     },
     async exportCSVToAnkiDeck() {
-      console.log(this.deckName.length, this.deckName);
       if (this.deckName.length > 3) {
         const apkg = new AnkiExport(this.deckName);
-        this.selected.forEach((item) => {
-          const { front, back } = item;
-          apkg.addCard(front, back);
+        this.parsedCSV.forEach((item) => {
+          let front = [];
+          let back = [];
+          Object.keys(item).forEach((key) => {
+            if (this.front.includes(key)) {
+              front.push(item[key]);
+            }
+            if (this.back.includes(key)) {
+              back.push(item[key]);
+            }
+          });
+          apkg.addCard(front.join("<br>"), back.join("<br>"));
         });
         const zip = await apkg
           .save()
@@ -202,8 +186,25 @@ export default {
     selectCards() {
       this.selectionFinished = true;
     },
+    handleUpdate(update) {
+      this.front = update.Front;
+      this.back = update.Back;
+    },
   },
   computed: {
+    headers() {
+      if (!this.csv.length) return null;
+      const [row] = this.csv.split("\n");
+      const titles = row.split(",");
+      return titles.map((title) => {
+        return { text: title, value: title };
+      });
+    },
+    titles() {
+      if (!this.csv.length) return null;
+      const [row] = this.csv.split("\n");
+      return row.split(",");
+    },
     preview() {
       const somethingToPreview = this.convertToHTML(this.textareaMd);
       if (somethingToPreview && this.currentTab === "editor") {
@@ -227,14 +228,21 @@ export default {
       return htmlString;
     },
     parsedCSV() {
-      const parsed = this.csv
-        .split("\n")
+      if (!this.headers.length && !this.csv.length) return null;
+      const [, ...data] = this.csv.split("\n");
+      const columns = data
         .filter((row) => row != "")
         .map((row) => {
-          const [front, back] = row.split(",");
-          return { front, back };
+          const column = row.split(",");
+          return column;
         });
-      console.log(parsed);
+      const parsed = columns.map((column) => {
+        let obj = {};
+        column.forEach((item, index) => {
+          obj[this.headers[index].value] = item;
+        });
+        return obj;
+      });
       return parsed;
     },
   },
